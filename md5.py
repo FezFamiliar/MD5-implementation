@@ -32,6 +32,9 @@ def I(x, y, z):
 def left_rotate(value,amount):
     return (value << amount) | (value >> (BITS - amount))
 
+def modulo_addition(a, b):
+    return ((a + b) % pow(2,32))
+
 def padding(msg):  
     msg_array = bitarray(endian='big')
     msg_array.frombytes(msg.encode('ascii'))
@@ -48,34 +51,61 @@ def padding(msg):
     
 
 
-
-
 def md5(msg):
     step  = 32
     M = [None] * 16
 
     for i in range(0,len(padding(msg)),step):
         M[int(i/step)] = padding(msg)[i:i+step]
-    
+
+    M = [int.from_bytes(word.tobytes(), byteorder="little") for word in M]
     a, b, c, d = init_buffer
     for r1 in range(16):
-        print(M[r1])
-        #print(left_rotate((a + F(b,c,d) + M[r1] + T[r1]),rotate_amounts[r1]))
-       # a = b + (left_rotate((a + F(b,c,d) + M[r1] + T[r1]),rotate_amounts[r1]))  
+        aux = modulo_addition(a,F(b,c,d))
+        aux = modulo_addition(aux,M[r1 % 16])
+        aux = modulo_addition(aux,T[r1])
+        aux = left_rotate(aux,rotate_amounts[r1])
+        aux = modulo_addition(aux,b)
+        a = d
+        d = c
+        c = b
+        b = aux
+
     for r2 in range(16,32):
-        pass
-      #  a = b + (left_rotate((a + G(b,c,d) + M[r2] + T[r2]),rotate_amounts[r2]))  
-    for r3 in range(32,48):
-        pass
-      #  a = b + (left_rotate((a + H(b,c,d) + M[r3] + T[r3]),rotate_amounts[r3]))  
-    for r4 in range(48,64):
-        pass
-       # a = b + (left_rotate((a + I(b,c,d) + M[r4] + T[r4]),rotate_amounts[r4])) 
+        aux = modulo_addition(a,G(b,c,d))
+        aux = modulo_addition(aux,M[r2 % 16])
+        aux = modulo_addition(aux,T[r2])
+        aux = left_rotate(aux,rotate_amounts[r2])
+        aux = modulo_addition(aux,b)
+        a = d
+        d = c
+        c = b
+        b = aux
  
+    for r3 in range(32,48):
+        aux = modulo_addition(a,H(b,c,d))
+        aux = modulo_addition(aux,M[r3 % 16])
+        aux = modulo_addition(aux,T[r3])
+        aux = left_rotate(aux,rotate_amounts[r3])
+        aux = modulo_addition(aux,b)
+        a = d
+        d = c
+        c = b
+        b = aux
+     
+    for r4 in range(48,64):
+        aux = modulo_addition(a,I(b,c,d))
+        aux = modulo_addition(aux,M[r4 % 16])
+        aux = modulo_addition(aux,T[r4])
+        aux = left_rotate(aux,rotate_amounts[r4])
+        aux = modulo_addition(aux,b)
+        a = d
+        d = c
+        c = b
+        b = aux
+    return f"{format(a, '08x')}{format(b, '08x')}{format(c, '08x')}{format(d, '08x')}"
 
-
-
-md5(message)
+print(md5(message))
 
 
 
