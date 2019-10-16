@@ -14,7 +14,7 @@ rotate_r4 = [6, 10, 15, 21]
 init_buffer = [0x01234567,0x89abcdef,0xfedcba98,0x76543210]
 
 BITS = 32
-message = 'fox'
+
 
 
 
@@ -104,10 +104,12 @@ def md5(msg):
         d = c
         c = b
         b = aux
-        
+
     return format(a,'0x') + format(b, '0x') + format(c, '0x') + format(d, '0x')
    
 
+
+message = 'fox'
 print(md5(message))
 
 
