@@ -1,8 +1,12 @@
 #!/usr/bin/python
 from bitarray import bitarray
+import binascii,math
 
+T = [int(2**32 * abs(math.sin(i))) for i in range(64)]
 
+message = 'fox'
 
+init_buffer = [0x01234567,0x89abcdef,0xfedcba98,0x76543210]
 
 def F(x, y, z):
     return x & y | (~x & z)
@@ -37,5 +41,8 @@ def padding(msg):
     return len(msg_array)
     
 
-message = 'fox'
-print(padding(message))
+
+
+
+
+print(T)
