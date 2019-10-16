@@ -5,10 +5,11 @@ import binascii,math
 T = [int(2**32 * abs(math.sin(i))) for i in range(64)]
 
 
-rotate_amounts = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
-                  5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
-                  4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-                  6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21]
+
+rotate_r1 = [7, 12, 17, 22]
+rotate_r2 = [5,  9, 14, 20]
+rotate_r3 = [4, 11, 16, 23]
+rotate_r4 = [6, 10, 15, 21]
 
 init_buffer = [0x01234567,0x89abcdef,0xfedcba98,0x76543210]
 
@@ -64,7 +65,7 @@ def md5(msg):
         aux = modulo_addition(a,F(b,c,d))
         aux = modulo_addition(aux,M[r1 % 16])
         aux = modulo_addition(aux,T[r1])
-        aux = left_rotate(aux,rotate_amounts[r1])
+        aux = left_rotate(aux,rotate_r1[r1 % 4])
         aux = modulo_addition(aux,b)
         a = d
         d = c
@@ -75,7 +76,7 @@ def md5(msg):
         aux = modulo_addition(a,G(b,c,d))
         aux = modulo_addition(aux,M[r2 % 16])
         aux = modulo_addition(aux,T[r2])
-        aux = left_rotate(aux,rotate_amounts[r2])
+        aux = left_rotate(aux,rotate_r2[r2 % 4])
         aux = modulo_addition(aux,b)
         a = d
         d = c
@@ -86,7 +87,7 @@ def md5(msg):
         aux = modulo_addition(a,H(b,c,d))
         aux = modulo_addition(aux,M[r3 % 16])
         aux = modulo_addition(aux,T[r3])
-        aux = left_rotate(aux,rotate_amounts[r3])
+        aux = left_rotate(aux,rotate_r3[r3 % 4])
         aux = modulo_addition(aux,b)
         a = d
         d = c
@@ -97,13 +98,15 @@ def md5(msg):
         aux = modulo_addition(a,I(b,c,d))
         aux = modulo_addition(aux,M[r4 % 16])
         aux = modulo_addition(aux,T[r4])
-        aux = left_rotate(aux,rotate_amounts[r4])
+        aux = left_rotate(aux,rotate_r4[r4 % 4])
         aux = modulo_addition(aux,b)
         a = d
         d = c
         c = b
         b = aux
-    return f"{format(a, '08x')}{format(b, '08x')}{format(c, '08x')}{format(d, '08x')}"
+        
+    return format(a,'0x') + format(b, '0x') + format(c, '0x') + format(d, '0x')
+   
 
 print(md5(message))
 
